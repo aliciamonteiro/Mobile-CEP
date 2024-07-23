@@ -1,70 +1,203 @@
-import { Image, StyleSheet, Platform } from 'react-native';
+import React, { useState } from "react";
+import { View, StyleSheet, Text, SafeAreaView, Platform, StatusBar, TextInput, TouchableOpacity, Alert, ActivityIndicator } from "react-native";
+import { Ionicons } from '@expo/vector-icons'; // Importando ícones do Expo
+import Api from '../../src/services/api';
 
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+export default function App() {
+  const [cep, setCep] = useState("");
+  const [logradouro, setLogradouro] = useState("");
+  const [bairro, setBairro] = useState("");
+  const [localidade, setLocalidade] = useState("");
+  const [uf, setUF] = useState("");
+  const [loading, setLoading] = useState(false); // Indicador de carregamento
 
-export default function HomeScreen() {
+  async function buscarCEP() {
+    if (cep === "" || cep.length !== 8) {
+      Alert.alert("CEP inválido! Certifique-se de que o CEP tem 8 dígitos.");
+      return;
+    }
+
+    setLoading(true); // Iniciar o indicador de carregamento
+
+    try {
+      const response = await Api.get(`${cep}/json/`);
+      console.log(response.data); // Log para verificar a estrutura da resposta
+
+      if (response.data.erro) {
+        Alert.alert("CEP não encontrado! Verifique o CEP e tente novamente.");
+        limparCampos(); // Limpar os campos se o CEP não for encontrado
+      } else {
+        setLogradouro(response.data.logradouro || "Não disponível");
+        setBairro(response.data.bairro || "Não disponível");
+        setLocalidade(response.data.localidade || "");
+        setUF(response.data.uf || "");
+      }
+    } catch (error) {
+      Alert.alert("Erro ao buscar CEP! Verifique a conexão e tente novamente.");
+    }
+
+    setLoading(false); // Parar o indicador de carregamento
+  }
+
+  function limparCampos() {
+    setCep("");
+    setLogradouro("");
+    setBairro("");
+    setLocalidade("");
+    setUF("");
+  }
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
+    <SafeAreaView style={styles.containerMain}>
+      <View style={styles.topBar}>
+        <Ionicons name="location" size={32} color="white" />
+        <Text style={styles.title}>Buscar CEP</Text>
+      </View>
+
+      <View style={styles.containerCEP}>
+        <TextInput
+          style={styles.input}
+          value={cep}
+          onChangeText={(texto) => setCep(texto)}
+          placeholder="Digite o CEP"
+          placeholderTextColor="#888"
+          keyboardType="numeric"
         />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({ ios: 'cmd + d', android: 'cmd + m' })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          Tap the Explore tab to learn more about what's included in this starter app.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          When you're ready, run{' '}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+
+        <TouchableOpacity style={styles.botaoBuscar} onPress={buscarCEP}>
+          <Ionicons name="search" size={20} color="white" />
+        </TouchableOpacity>
+      </View>
+
+      {loading && (
+        <ActivityIndicator size="large" color="#00C853" style={styles.loading} />
+      )}
+
+      <View style={styles.resultadoContainer}>
+        <TextInput
+          style={styles.resultadoCEP}
+          value={logradouro}
+          onChangeText={(texto) => setLogradouro(texto)}
+          placeholder="Logradouro"
+          placeholderTextColor="#888"
+          editable={false}
+        />
+
+        <TextInput
+          style={styles.resultadoCEP}
+          value={bairro}
+          onChangeText={(texto) => setBairro(texto)}
+          placeholder="Bairro"
+          placeholderTextColor="#888"
+          editable={false}
+        />
+
+        <TextInput
+          style={styles.resultadoCEP}
+          value={localidade}
+          onChangeText={(texto) => setLocalidade(texto)}
+          placeholder="Cidade"
+          placeholderTextColor="#888"
+          editable={false}
+        />
+
+        <TextInput
+          style={styles.resultadoCEP}
+          value={uf}
+          onChangeText={(texto) => setUF(texto)}
+          placeholder="UF"
+          placeholderTextColor="#888"
+          editable={false}
+        />
+      </View>
+
+      <TouchableOpacity style={styles.botaoLimpar} onPress={limparCampos}>
+        <Text style={styles.botaoLimparText}>Limpar</Text>
+      </TouchableOpacity>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+  containerMain: {
+    flex: 1,
+    backgroundColor: "#FFFFFF",
+    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  topBar: {
+    flexDirection: "row",
+    height: 70,
+    backgroundColor: "#00C853", // Verde mais forte
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 20,
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  title: {
+    color: "#FFFFFF",
+    fontSize: 24,
+    fontWeight: "bold",
+    marginLeft: 10,
+  },
+  containerCEP: {
+    flexDirection: "row",
+    height: 70,
+    marginHorizontal: 20,
+    alignItems: "center",
+    justifyContent: "center",
+    marginVertical: 10, // Reduzido para menor espaçamento
+    borderRadius: 10,
+    padding: 10,
+    backgroundColor: "#F0F0F0",
+  },
+  input: {
+    height: 50,
+    borderColor: "#00C853", // Verde mais forte
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    backgroundColor: "#FFF",
+    width: "70%",
+    marginRight: 10,
+  },
+  botaoBuscar: {
+    backgroundColor: "#00C853", // Verde mais forte
+    borderRadius: 5,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 15,
+    paddingVertical: 5,
+    height: 40,
+  },
+  botaoLimpar: {
+    backgroundColor: "#00C853", // Verde mais forte
+    borderRadius: 5,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+    marginHorizontal: 20,
+    marginTop: 20,
+  },
+  botaoLimparText: {
+    color: "#FFFFFF",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  resultadoContainer: {
+    marginHorizontal: 20,
+    marginTop: 20,
+  },
+  resultadoCEP: {
+    height: 50,
+    borderColor: "#00C853", // Verde mais forte
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    backgroundColor: "#FFF", // Fundo branco
+    marginBottom: 10,
+    color: '#000', // Cor do texto
+  },
+  loading: {
+    marginTop: 20,
   },
 });
