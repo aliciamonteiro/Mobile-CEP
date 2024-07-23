@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { View, StyleSheet, Text, SafeAreaView, Platform, StatusBar, TextInput, TouchableOpacity, Alert, ActivityIndicator } from "react-native";
-import { Ionicons } from '@expo/vector-icons'; // Importando ícones do Expo
+import { Ionicons } from '@expo/vector-icons'; 
 import Api from '../../src/services/api';
 
 export default function App() {
@@ -36,7 +36,7 @@ export default function App() {
       Alert.alert("Erro ao buscar CEP! Verifique a conexão e tente novamente.");
     }
 
-    setLoading(false); // Parar o indicador de carregamento
+    setLoading(false); 
   }
 
   function limparCampos() {
@@ -127,7 +127,7 @@ const styles = StyleSheet.create({
   topBar: {
     flexDirection: "row",
     height: 70,
-    backgroundColor: "#00C853", // Verde mais forte
+    backgroundColor: "#00C853", 
     justifyContent: "center",
     alignItems: "center",
     paddingHorizontal: 20,
@@ -144,14 +144,14 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
     alignItems: "center",
     justifyContent: "center",
-    marginVertical: 10, // Reduzido para menor espaçamento
+    marginVertical: 10, 
     borderRadius: 10,
     padding: 10,
     backgroundColor: "#F0F0F0",
   },
   input: {
     height: 50,
-    borderColor: "#00C853", // Verde mais forte
+    borderColor: "#00C853", 
     borderWidth: 1,
     borderRadius: 8,
     paddingHorizontal: 10,
@@ -160,7 +160,7 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   botaoBuscar: {
-    backgroundColor: "#00C853", // Verde mais forte
+    backgroundColor: "#00C853", 
     borderRadius: 5,
     justifyContent: "center",
     alignItems: "center",
@@ -169,7 +169,7 @@ const styles = StyleSheet.create({
     height: 40,
   },
   botaoLimpar: {
-    backgroundColor: "#00C853", // Verde mais forte
+    backgroundColor: "#00C853", 
     borderRadius: 5,
     justifyContent: "center",
     alignItems: "center",
@@ -189,13 +189,13 @@ const styles = StyleSheet.create({
   },
   resultadoCEP: {
     height: 50,
-    borderColor: "#00C853", // Verde mais forte
+    borderColor: "#00C853", 
     borderWidth: 1,
     borderRadius: 8,
     paddingHorizontal: 10,
-    backgroundColor: "#FFF", // Fundo branco
+    backgroundColor: "#FFF", 
     marginBottom: 10,
-    color: '#000', // Cor do texto
+    color: '#000', 
   },
   loading: {
     marginTop: 20,
